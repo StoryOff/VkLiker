@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VkLikerMVVM.ViewModels.Models
+namespace VkLikerMVVM.ViewModels
 {
-    class Settings
+    public class Settings : JsonSettings
     {
+
     }
 }
