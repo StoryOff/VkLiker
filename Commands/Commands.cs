@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 
-namespace VkLikerMVVM.ViewModels
+namespace VkLikerMVVM
 {
-    public class Settings : JsonSettings
+    class Commands
     {
-
     }
 }

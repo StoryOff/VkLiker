@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace VkLikerMVVM.ViewModels
+namespace VkLikerMVVM
 {
-    public class BaseVM : INotifyPropertyChanged
+    class BaseVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)

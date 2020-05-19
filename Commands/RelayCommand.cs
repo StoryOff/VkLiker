@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace VkLikerMVVM
 {
-    public class RelayCommand : ICommand
+    class RelayCommand : ICommand
     {
         private Action<object> execute;
         private Func<object, bool> canExecute;

@@ -8,7 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0821" />
+    <PackageReference Include="protobuf-net" Version="2.4.0" />
     <PackageReference Include="VkNet" Version="1.52.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="VkNet.AudioBypassService">
+      <HintPath>VkNet.AudioBypassService.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

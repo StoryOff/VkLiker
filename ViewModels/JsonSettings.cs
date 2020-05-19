@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace VkLikerMVVM.ViewModels
+namespace VkLikerMVVM
 {
-    public class JsonSettings : BaseVM
+    class JsonSettings : BaseVM
     {
         #region Storage
 

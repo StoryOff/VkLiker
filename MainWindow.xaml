@@ -6,8 +6,151 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VkLikerMVVM"
         mc:Ignorable="d"
-        Title="VK Liker" Height="450" Width="800">
+        Title="VK Liker" Height="550" Width="300"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Closing="MainWindowClosing">
     <Grid>
+        <!-- Login -->
+        <StackPanel x:Name="LoginStackPanel" Visibility="{Binding IsLoginPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="155" Width="230">
+            <StackPanel.InputBindings>
+                <KeyBinding 
+                    Key="Enter" 
+                    Command="{Binding LoginCommand}" 
+                    CommandParameter="{Binding ElementName=PasswordBox, Path=Password}"/>
+            </StackPanel.InputBindings>
+            <StackPanel Height="69">
+                <StackPanel Visibility="{Binding IsLogPassVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBox Text="{Binding LoginTextBox}" Controls:TextBoxHelper.Watermark="               Логин" FontSize="14" FontFamily="Segoe Print">
+                        <TextBox.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="#FFDE207F"/>
+                            </RadialGradientBrush>
+                        </TextBox.Background>
+                    </TextBox>
+                    <PasswordBox x:Name="PasswordBox" FontFamily="Segoe Print" FontSize="14" Controls:TextBoxHelper.Watermark="              Пароль" Style="{StaticResource MahApps.Styles.PasswordBox.ButtonRevealed}" PasswordChar="*" PasswordChanged="PasswordBox_PasswordChanged">
+                        <PasswordBox.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="#FFDE207F"/>
+                            </RadialGradientBrush>
+                        </PasswordBox.Background>
+                    </PasswordBox>
+                </StackPanel>
+            </StackPanel>
+            <Button Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Content="Login" Height="50" FontWeight="Bold" FontSize="12" FontFamily="Ink Free">
+                <Button.Background>
+                    <RadialGradientBrush>
+                        <GradientStop Color="Black" Offset="1"/>
+                        <GradientStop Color="#FFFF29EC"/>
+                    </RadialGradientBrush>
+                </Button.Background>
+            </Button>
+            <TextBox Text="{Binding TwoAuthTextBox}" Visibility="{Binding IsTwoAuthVisible, Converter={StaticResource BooleanToVisibilityConverter}}" FontFamily="Segoe Print" FontSize="14" Controls:TextBoxHelper.Watermark="           TwoAuth код">
+                <TextBox.Background>
+                    <RadialGradientBrush>
+                        <GradientStop Color="Black" Offset="1"/>
+                        <GradientStop Color="#FFDE207F"/>
+                    </RadialGradientBrush>
+                </TextBox.Background>
+            </TextBox>
+        </StackPanel>
 
+        <!-- Main Interface -->
+        <Grid Visibility="{Binding IsMainInterfaceVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.65*"/>
+                <RowDefinition Height="0.25*"/>
+                <RowDefinition Height="0.25*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding ScreenName}" FontFamily="Segoe Print" FontSize="20" FontWeight="Bold" TextAlignment="Center" />
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.19*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Total Posts:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
+                <TextBlock Grid.Row="1" Text="Posts Liked:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
+                <TextBlock Grid.Row="2" Text="Total Photos:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
+                <TextBlock Grid.Row="3" Text="Photos Liked:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
+                <TextBlock Text="100" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
+                <TextBlock Text="0" Grid.Row="1" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
+                <TextBlock Text="0" Grid.Row="2" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
+                <TextBlock Text="0" Grid.Row="3" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
+            </Grid>
+            <StackPanel Grid.Row="2">
+                <TextBlock Text="Задержка в секундах:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
+                <DockPanel LastChildFill="False">
+                    <TextBlock Text=" От " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
+                    <TextBox Width="101" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                        <TextBox.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="#FF2DCF14"/>
+                            </RadialGradientBrush>
+                        </TextBox.Background>
+                    </TextBox>
+                    <TextBlock Text=" До " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
+                    <TextBox Width="101" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                        <TextBox.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="#FF2DCF14"/>
+                            </RadialGradientBrush>
+                        </TextBox.Background>
+                    </TextBox>
+                </DockPanel>
+            </StackPanel>
+            <DockPanel Grid.Row="3">
+                <TextBlock Text=" Оффсет: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Right"/>
+                <TextBox FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                    <TextBox.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="1"/>
+                            <GradientStop Color="#FF2DCF14"/>
+                        </RadialGradientBrush>
+                    </TextBox.Background>
+                </TextBox>
+            </DockPanel>
+            <DockPanel Grid.Row="4">
+                <TextBlock Width="112" Text=" Цель: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"/>
+                <TextBox FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                    <TextBox.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="1"/>
+                            <GradientStop Color="#FFB40404"/>
+                        </RadialGradientBrush>
+                    </TextBox.Background>
+                </TextBox>
+            </DockPanel>
+            <StackPanel Grid.Row="5">
+                <Button Height="75" Content="Like Posts" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
+                    <Button.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="0.695"/>
+                            <GradientStop Color="#FF430085" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Button.Background>
+                </Button>
+                <Button Height="75" Content="Like Photos" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
+                    <Button.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="0.695"/>
+                            <GradientStop Color="#FF430085" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Button.Background>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Controls:MetroWindow>
