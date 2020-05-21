@@ -1,19 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 using VkNet;
 using VkNet.AudioBypassService.Extensions;
-using VkNet.AudioBypassService.Models;
 using VkNet.Model;
 
 namespace VkLikerMVVM
 {
-    class LoginFunction
+    class LoginFunctions
     {
          private static readonly VkApi Api = new VkApi(new ServiceCollection().AddAudioBypass());
 

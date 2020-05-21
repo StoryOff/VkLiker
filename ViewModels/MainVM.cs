@@ -60,7 +60,7 @@ namespace VkLikerMVVM
                 _api = value;
                 if (Api.IsAuthorized)
                 {
-                    CurrentUser = LoginFunction.GetCurrentUser();
+                    CurrentUser = LoginFunctions.GetCurrentUser();
                     _likesFunctions = new LikesFunctions(value);
                 }
             }
@@ -290,7 +290,7 @@ namespace VkLikerMVVM
                 //логин по токену, если есть
                 if (Settings.Instance.Token != null)
                 {
-                    Api = await LoginFunction.Login(Settings.Instance.Token);
+                    Api = await LoginFunctions.Login(Settings.Instance.Token);
                     IsMainInterfaceVisible = true;
                     return;
                 }
@@ -299,7 +299,7 @@ namespace VkLikerMVVM
                 {
                     if (!string.IsNullOrWhiteSpace(TwoAuthTextBox) && TwoAuthTextBox.Length > 3)
                     {
-                        Api = await LoginFunction.Login(LoginTextBox, PasswordBox, TwoAuthTextBox);
+                        Api = await LoginFunctions.Login(LoginTextBox, PasswordBox, TwoAuthTextBox);
                     }
                     else MessageBox.Show("Введите код Двойной Аутентификации");
                 }
@@ -308,7 +308,7 @@ namespace VkLikerMVVM
                 {
                     if (!string.IsNullOrWhiteSpace(LoginTextBox) && !string.IsNullOrWhiteSpace(PasswordBox) && LoginTextBox.Length > 4 && PasswordBox.Length > 5)
                     {
-                        Api = await LoginFunction.Login(LoginTextBox, PasswordBox);
+                        Api = await LoginFunctions.Login(LoginTextBox, PasswordBox);
                     }
                     else MessageBox.Show("Введите Логин и Пароль");
                 }
