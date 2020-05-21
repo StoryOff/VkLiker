@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using VkNet;
-using VkNet.AudioBypassService.Extensions;
-
-namespace VkLikerMVVM
+﻿namespace VkLikerMVVM
 {
     class Settings : JsonSettings
     {

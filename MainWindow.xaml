@@ -8,9 +8,8 @@
         mc:Ignorable="d"
         Title="VK Liker" Height="550" Width="300"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanMinimize"
-        Closing="MainWindowClosing">
-    <Grid>
+        ResizeMode="CanMinimize">
+    <Grid IsHitTestVisible="{Binding IsUIUnLocked}">
         <!-- Login -->
         <StackPanel x:Name="LoginStackPanel" Visibility="{Binding IsLoginPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="155" Width="230">
             <StackPanel.InputBindings>
@@ -62,12 +61,13 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.3*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="0.65*"/>
+                <RowDefinition Height="0.55*"/>
+                <RowDefinition Height="0.25*"/>
                 <RowDefinition Height="0.25*"/>
                 <RowDefinition Height="0.25*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding ScreenName}" FontFamily="Segoe Print" FontSize="20" FontWeight="Bold" TextAlignment="Center" />
+            <TextBlock Text="{Binding ScreenName, FallbackValue=Screen Name}" FontFamily="Segoe Print" FontSize="20" FontWeight="Bold" TextAlignment="Center" />
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -77,54 +77,65 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.19*"/>
+                    <ColumnDefinition Width="0.35*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Total Posts:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
-                <TextBlock Grid.Row="1" Text="Posts Liked:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
-                <TextBlock Grid.Row="2" Text="Total Photos:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
-                <TextBlock Grid.Row="3" Text="Photos Liked:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
-                <TextBlock Text="100" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
-                <TextBlock Text="0" Grid.Row="1" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
-                <TextBlock Text="0" Grid.Row="2" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
-                <TextBlock Text="0" Grid.Row="3" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000"/>
+                <TextBlock Text="Total Posts:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black"/>
+                <TextBlock Grid.Row="1" Text="Post Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
+                <TextBlock Grid.Row="2" Text="Total Photos:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black"/>
+                <TextBlock Grid.Row="3" Text="Photo Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="Black" Foreground="#FFE80000"/>
+                <TextBlock Text="{Binding TotalPosts}" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
+                <TextBlock Text="{Binding PostLiked}" Grid.Row="1" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black"/>
+                <TextBlock Text="{Binding TotalPhotos}" Grid.Row="2" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black"/>
+                <TextBlock Text="{Binding PhotoLiked}" Grid.Row="3" Grid.Column="1" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black"/>
             </Grid>
             <StackPanel Grid.Row="2">
                 <TextBlock Text="Задержка в секундах:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
                 <DockPanel LastChildFill="False">
                     <TextBlock Text=" От " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
-                    <TextBox Width="101" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                    <local:OnlyNumbersTextBox Text="{Binding DelayMin}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                         <TextBox.Background>
                             <RadialGradientBrush>
                                 <GradientStop Color="Black" Offset="1"/>
                                 <GradientStop Color="#FF2DCF14"/>
                             </RadialGradientBrush>
                         </TextBox.Background>
-                    </TextBox>
+                    </local:OnlyNumbersTextBox>
                     <TextBlock Text=" До " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
-                    <TextBox Width="101" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                    <local:OnlyNumbersTextBox Text="{Binding DelayMax}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                         <TextBox.Background>
                             <RadialGradientBrush>
                                 <GradientStop Color="Black" Offset="1"/>
                                 <GradientStop Color="#FF2DCF14"/>
                             </RadialGradientBrush>
                         </TextBox.Background>
-                    </TextBox>
+                    </local:OnlyNumbersTextBox>
                 </DockPanel>
             </StackPanel>
             <DockPanel Grid.Row="3">
+                <TextBlock Width="112" Text=" Количество: (0 = лайк все)" FontSize="13" FontWeight="Bold" FontFamily="Segoe Script" TextWrapping="Wrap"/>
+                <local:OnlyNumbersTextBox Text="{Binding LikesAmount, Mode=TwoWay}" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Controls:TextBoxHelper.Watermark=" Стандартно = все">
+                    <TextBox.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="1"/>
+                            <GradientStop Color="#FFB40404"/>
+                        </RadialGradientBrush>
+                    </TextBox.Background>
+                </local:OnlyNumbersTextBox>
+            </DockPanel>
+            <DockPanel Grid.Row="4">
                 <TextBlock Text=" Оффсет: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Right"/>
-                <TextBox FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                <local:OnlyNumbersTextBox Text="{Binding LikesOffset}" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                     <TextBox.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="1"/>
                             <GradientStop Color="#FF2DCF14"/>
                         </RadialGradientBrush>
                     </TextBox.Background>
-                </TextBox>
+                </local:OnlyNumbersTextBox>
             </DockPanel>
-            <DockPanel Grid.Row="4">
+            <DockPanel Grid.Row="5">
                 <TextBlock Width="112" Text=" Цель: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"/>
-                <TextBox FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
+                <TextBox Text="{Binding LikesTarget}" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center">
                     <TextBox.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="1"/>
@@ -133,8 +144,8 @@
                     </TextBox.Background>
                 </TextBox>
             </DockPanel>
-            <StackPanel Grid.Row="5">
-                <Button Height="75" Content="Like Posts" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
+            <StackPanel Grid.Row="6">
+                <Button Command="{Binding GetInfo}" Height="50" Content="Получить информацию" FontSize="15" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
                     <Button.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="0.695"/>
@@ -142,7 +153,15 @@
                         </RadialGradientBrush>
                     </Button.Background>
                 </Button>
-                <Button Height="75" Content="Like Photos" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
+                <Button Command="{Binding LikePosts}" Height="50" Content="Like Posts" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
+                    <Button.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="Black" Offset="0.695"/>
+                            <GradientStop Color="#FF430085" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Button.Background>
+                </Button>
+                <Button Command="{Binding LikePhotos}" Height="50" Content="Like Photos" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" Foreground="#FF6A00D3">
                     <Button.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="0.695"/>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,43 +15,48 @@ namespace VkLikerMVVM
 {
     class LoginFunction
     {
+         private static readonly VkApi Api = new VkApi(new ServiceCollection().AddAudioBypass());
+
         //Логин по токену
-        public static async Task Login(string token, VkApi api)
+        public static async Task<VkApi> Login(string token)
         {
-            await api.AuthorizeAsync(new ApiAuthParams
+            await Api.AuthorizeAsync(new ApiAuthParams
             {
                 AccessToken = token
             });
 
-            GetCurrentUser(api);
+            return Api;
         }
 
         //Логин по логину/номеру телефона и паролю
-        public static async Task Login(string login, string password, VkApi api)
+        public static async Task<VkApi> Login(string login, string password)
         {
-            await api.AuthorizeAsync(new ApiAuthParams
-            {
-                Login = login,
-                Password = password
-            });
-            GetCurrentUser(api);
-        }
-
-        //Логин по логину и паролю с двухфакторной аутентификацией
-        public static async Task Login(string login, string password, string twoAuth, VkApi api)
-        {
-            await api.AuthorizeAsync(new ApiAuthParams
+            await Api.AuthorizeAsync(new ApiAuthParams
             {
                 Login = login,
                 Password = password,
-                TwoFactorAuthorization = () => { return twoAuth; }
+                ForceSms = true
             });
-            GetCurrentUser(api);
+
+            return Api;
         }
 
-        private static void GetCurrentUser(VkApi api)
+        //Логин по логину и паролю с двухфакторной аутентификацией
+        public static async Task<VkApi> Login(string login, string password, string twoAuth)
         {
-            MainVM.CurrentUser = api.Users.Get(new List<long>(), VkNet.Enums.Filters.ProfileFields.ScreenName).FirstOrDefault();
+            await Api.AuthorizeAsync(new ApiAuthParams
+            {
+                Login = login,
+                Password = password,
+                TwoFactorAuthorization = () => twoAuth
+            });
+
+            return Api;
+        }
+
+        public static User GetCurrentUser()
+        {
+            return Api.Users.Get(new List<long>(), VkNet.Enums.Filters.ProfileFields.ScreenName).FirstOrDefault();
         }
     }
 }

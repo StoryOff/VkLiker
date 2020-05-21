@@ -6,7 +6,7 @@ using System.Text;
 
 namespace VkLikerMVVM
 {
-    class BaseVM : INotifyPropertyChanged
+    class BaseVm : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
