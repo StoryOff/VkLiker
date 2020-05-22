@@ -9,21 +9,21 @@
                  mc:Ignorable="d"
                  Title="VK Liker" Height="550" Width="300"
                  WindowStartupLocation="CenterScreen"
-                 ResizeMode="CanMinimize" d:DataContext="{d:DesignInstance viewModels:MainVm }">
+                 ResizeMode="CanMinimize" d:DataContext="{d:DesignInstance viewModels:MainViewModel }">
     <Grid IsHitTestVisible="{Binding IsUiUnLocked}">
         <!-- Login -->
-        <StackPanel x:Name="LoginStackPanel"
-                    Visibility="{Binding IsLoginPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Height="155" Width="230">
+        <StackPanel
+            Visibility="{Binding IsLoginPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+            HorizontalAlignment="Center" VerticalAlignment="Center" Height="155" Width="230">
             <StackPanel.InputBindings>
                 <KeyBinding
                     Key="Enter"
-                    Command="{Binding LoginCommand}"
-                    CommandParameter="{Binding ElementName=PasswordBox, Path=Password}" />
+                    Command="{Binding AuthorizeCommand}"
+                    CommandParameter="{Binding ElementName=PasswordBox}" />
             </StackPanel.InputBindings>
             <StackPanel Height="69">
                 <StackPanel Visibility="{Binding IsLogPassVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBox Text="{Binding LoginTextBox}" mah:TextBoxHelper.Watermark="               Логин" FontSize="14"
+                    <TextBox Text="{Binding Login}" mah:TextBoxHelper.Watermark="               Логин" FontSize="14"
                              FontFamily="Segoe Print">
                         <TextBox.Background>
                             <RadialGradientBrush>
@@ -34,8 +34,7 @@
                     </TextBox>
                     <PasswordBox x:Name="PasswordBox" FontFamily="Segoe Print" FontSize="14"
                                  mah:TextBoxHelper.Watermark="              Пароль"
-                                 Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" PasswordChar="*"
-                                 PasswordChanged="PasswordBox_PasswordChanged">
+                                 PasswordChar="*">
                         <PasswordBox.Background>
                             <RadialGradientBrush>
                                 <GradientStop Color="Black" Offset="1" />
@@ -45,7 +44,8 @@
                     </PasswordBox>
                 </StackPanel>
             </StackPanel>
-            <Button Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Content="Login" Height="50"
+            <Button Command="{Binding AuthorizeCommand}" CommandParameter="{Binding ElementName=PasswordBox}"
+                    Content="Login" Height="50"
                     FontWeight="Bold" FontSize="12" FontFamily="Ink Free">
                 <Button.Background>
                     <RadialGradientBrush>
@@ -54,7 +54,7 @@
                     </RadialGradientBrush>
                 </Button.Background>
             </Button>
-            <TextBox Text="{Binding TwoAuthTextBox}"
+            <TextBox Text="{Binding TwoAuthCode}"
                      Visibility="{Binding IsTwoAuthVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                      FontFamily="Segoe Print" FontSize="14" mah:TextBoxHelper.Watermark="           TwoAuth код">
                 <TextBox.Background>
@@ -92,21 +92,27 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Total Posts:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"
                            Background="#FFE80000" Foreground="Black" />
+                <mah:NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding TotalPosts}"
+                                   FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
+                                   TextAlignment="Center" Foreground="#FFE80000" Background="Black" />
+
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Post Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="Black" Foreground="#FFE80000" />
+                <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding PostsLiked}"
+                                   FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
+                                   TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
+
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Photos:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
+                <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding TotalPhotos}"
+                                   FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
+                                   TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
+
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Photo Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="Black" Foreground="#FFE80000" />
-                <TextBlock Text="{Binding TotalPosts}" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold"
-                           FontFamily="Segoe Script"
-                           TextAlignment="Center" Foreground="#FFE80000" Background="Black" />
-                <TextBlock Text="{Binding PostLiked}" Grid.Row="1" Grid.Column="1" FontSize="20" FontWeight="Bold"
-                           FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
-                <TextBlock Text="{Binding TotalPhotos}" Grid.Row="2" Grid.Column="1" FontSize="20" FontWeight="Bold"
-                           FontFamily="Segoe Script" TextAlignment="Center" Foreground="#FFE80000" Background="Black" />
-                <TextBlock Text="{Binding PhotoLiked}" Grid.Row="3" Grid.Column="1" FontSize="20" FontWeight="Bold"
-                           FontFamily="Segoe Script" TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
+                <mah:NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding PhotosLiked}"
+                                   FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
+                                   TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
             </Grid>
             <StackPanel Grid.Row="2">
                 <TextBlock Text="Задержка в секундах:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" />
@@ -136,7 +142,7 @@
             <DockPanel Grid.Row="3">
                 <TextBlock Width="112" Text=" Количество: (0 = лайк все)" FontSize="13" FontWeight="Bold" FontFamily="Segoe Script"
                            TextWrapping="Wrap" />
-                <localControls:OnlyNumbersTextBox Text="{Binding LikesAmount, Mode=TwoWay}" FontSize="20" FontWeight="Bold"
+                <localControls:OnlyNumbersTextBox Text="{Binding LikesCount, Mode=TwoWay}" FontSize="20" FontWeight="Bold"
                                                   FontFamily="Segoe Script" TextAlignment="Center"
                                                   mah:TextBoxHelper.Watermark=" Стандартно = все">
                     <TextBox.Background>
@@ -171,7 +177,7 @@
                 </TextBox>
             </DockPanel>
             <StackPanel Grid.Row="6">
-                <Button Command="{Binding GetInfo}" Height="50" Content="Получить информацию" FontSize="15" FontWeight="Bold"
+                <Button Command="{Binding GetInfoCommand}" Height="50" Content="Получить информацию" FontSize="15" FontWeight="Bold"
                         FontFamily="Segoe Script" Foreground="#FF6A00D3">
                     <Button.Background>
                         <RadialGradientBrush>
@@ -180,7 +186,7 @@
                         </RadialGradientBrush>
                     </Button.Background>
                 </Button>
-                <Button Command="{Binding LikePosts}" Height="50" Content="Like Posts" FontSize="20" FontWeight="Bold"
+                <Button Command="{Binding LikePostsCommand}" Height="50" Content="Like Posts" FontSize="20" FontWeight="Bold"
                         FontFamily="Segoe Script" Foreground="#FF6A00D3">
                     <Button.Background>
                         <RadialGradientBrush>
@@ -189,7 +195,7 @@
                         </RadialGradientBrush>
                     </Button.Background>
                 </Button>
-                <Button Command="{Binding LikePhotos}" Height="50" Content="Like Photos" FontSize="20" FontWeight="Bold"
+                <Button Command="{Binding LikePhotosCommand}" Height="50" Content="Like Photos" FontSize="20" FontWeight="Bold"
                         FontFamily="Segoe Script" Foreground="#FF6A00D3">
                     <Button.Background>
                         <RadialGradientBrush>

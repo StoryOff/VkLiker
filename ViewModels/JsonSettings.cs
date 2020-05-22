@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace VkLikerMVVM.ViewModels
 {
-    class JsonSettings : BaseVm
+    class JsonSettings : ViewModelBase
     {
         #region Storage
 
