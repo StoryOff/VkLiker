@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VkLikerMVVM"
+        xmlns:controls="clr-namespace:VkLikerMVVM.Controls"
         mc:Ignorable="d"
         Title="VK Liker" Height="550" Width="300"
         WindowStartupLocation="CenterScreen"
@@ -92,46 +93,46 @@
                 <TextBlock Text="Задержка в секундах:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
                 <DockPanel LastChildFill="False">
                     <TextBlock Text=" От " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
-                    <local:OnlyNumbersTextBox Text="{Binding DelayMin}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
+                    <controls:OnlyNumbersTextBox Text="{Binding DelayMin}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                         <TextBox.Background>
                             <RadialGradientBrush>
                                 <GradientStop Color="Black" Offset="1"/>
                                 <GradientStop Color="#FF2DCF14"/>
                             </RadialGradientBrush>
                         </TextBox.Background>
-                    </local:OnlyNumbersTextBox>
+                    </controls:OnlyNumbersTextBox>
                     <TextBlock Text=" До " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"/>
-                    <local:OnlyNumbersTextBox Text="{Binding DelayMax}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
+                    <controls:OnlyNumbersTextBox Text="{Binding DelayMax}" Width="101" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                         <TextBox.Background>
                             <RadialGradientBrush>
                                 <GradientStop Color="Black" Offset="1"/>
                                 <GradientStop Color="#FF2DCF14"/>
                             </RadialGradientBrush>
                         </TextBox.Background>
-                    </local:OnlyNumbersTextBox>
+                    </controls:OnlyNumbersTextBox>
                 </DockPanel>
             </StackPanel>
             <DockPanel Grid.Row="3">
                 <TextBlock Width="112" Text=" Количество: (0 = лайк все)" FontSize="13" FontWeight="Bold" FontFamily="Segoe Script" TextWrapping="Wrap"/>
-                <local:OnlyNumbersTextBox Text="{Binding LikesAmount, Mode=TwoWay}" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Controls:TextBoxHelper.Watermark=" Стандартно = все">
+                <controls:OnlyNumbersTextBox Text="{Binding LikesAmount, Mode=TwoWay}" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Controls:TextBoxHelper.Watermark=" Стандартно = все">
                     <TextBox.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="1"/>
                             <GradientStop Color="#FFB40404"/>
                         </RadialGradientBrush>
                     </TextBox.Background>
-                </local:OnlyNumbersTextBox>
+                </controls:OnlyNumbersTextBox>
             </DockPanel>
             <DockPanel Grid.Row="4">
                 <TextBlock Text=" Оффсет: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Right"/>
-                <local:OnlyNumbersTextBox Text="{Binding LikesOffset}" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
+                <controls:OnlyNumbersTextBox Text="{Binding LikesOffset}" FontSize="21" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center" Foreground="Black">
                     <TextBox.Background>
                         <RadialGradientBrush>
                             <GradientStop Color="Black" Offset="1"/>
                             <GradientStop Color="#FF2DCF14"/>
                         </RadialGradientBrush>
                     </TextBox.Background>
-                </local:OnlyNumbersTextBox>
+                </controls:OnlyNumbersTextBox>
             </DockPanel>
             <DockPanel Grid.Row="5">
                 <TextBlock Width="112" Text=" Цель: " FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"/>

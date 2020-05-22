@@ -1,7 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Controls;
-
+using VkLikerMVVM.ViewModels;
 
 namespace VkLikerMVVM
 {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace VkLikerMVVM
+namespace VkLikerMVVM.ViewModels
 {
     class BaseVm : INotifyPropertyChanged
     {

@@ -9,7 +9,7 @@ using VkNet.Model.Attachments;
 using VkNet.Model.RequestParams;
 using VkNet.Utils;
 
-namespace VkLikerMVVM
+namespace VkLikerMVVM.Commands
 {
     class LikesFunctions
     {

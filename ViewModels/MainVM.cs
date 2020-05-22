@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using VkLikerMVVM.Commands;
 using VkNet;
 using VkNet.Model;
 
-namespace VkLikerMVVM
+namespace VkLikerMVVM.ViewModels
 {
     class MainVm : BaseVm
     {
