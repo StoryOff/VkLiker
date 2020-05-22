@@ -92,25 +92,25 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Total Posts:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script" TextAlignment="Center"
                            Background="#FFE80000" Foreground="Black" />
-                <mah:NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding TotalPosts}"
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalPosts}"
                                    FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                                    TextAlignment="Center" Foreground="#FFE80000" Background="Black" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Post Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="Black" Foreground="#FFE80000" />
-                <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding PostsLiked}"
+                <TextBlock  Grid.Row="1" Grid.Column="1" Text="{Binding PostsLiked}"
                                    FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                                    TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Photos:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
-                <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding TotalPhotos}"
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalPhotos}"
                                    FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
-                                   TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
+                                   TextAlignment="Center" Background="Black" Foreground="#FFE80000" />
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Photo Liked №:" FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                            TextAlignment="Center" Background="Black" Foreground="#FFE80000" />
-                <mah:NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding PhotosLiked}"
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding PhotosLiked}"
                                    FontSize="20" FontWeight="Bold" FontFamily="Segoe Script"
                                    TextAlignment="Center" Background="#FFE80000" Foreground="Black" />
             </Grid>

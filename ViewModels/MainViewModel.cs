@@ -54,7 +54,7 @@ namespace VkLikerMVVM.ViewModels
 
             AuthorizeCommand = new RelayCommand(obj => Authorize(obj as PasswordBox));
             GetInfoCommand = new RelayCommand(async obj => await GetInfo());
-            LikePostsCommand = new RelayCommand(async obj => await LikePosts());
+            LikePostsCommand = new RelayCommand(obj => LikePosts());
             LikePhotosCommand = new RelayCommand(obj => LikePhotos());
 
             #endregion
@@ -315,7 +315,7 @@ namespace VkLikerMVVM.ViewModels
             }
         }
 
-        private async Task LikePosts()
+        private async void LikePosts()
         {
             if (string.IsNullOrEmpty(LikesTarget))
                 MessageBox.Show("Введите цель", "Error");
