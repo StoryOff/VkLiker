@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace VkLikerMVVM
+namespace VkLikerMVVM.Commands
 {
     class RelayCommand : ICommand
     {

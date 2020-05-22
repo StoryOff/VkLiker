@@ -9,7 +9,7 @@ using VkNet.Model.Attachments;
 using VkNet.Model.RequestParams;
 using VkNet.Utils;
 
-namespace VkLikerMVVM
+namespace VkLikerMVVM.Commands
 {
     class LikesFunctions
     {
@@ -43,21 +43,21 @@ namespace VkLikerMVVM
         private ulong TotalPhotos { get; set; }
 
         //Получить информацию о количестве постов и фото пользователя
-        public async Task GetTargetInfo(IProgress<string> progressPosts = null, IProgress<string> progressPhotos = null)
+        public async Task GetTargetInfo(IProgress<ulong> progressPosts = null, IProgress<ulong> progressPhotos = null)
         {
             long targetUserId = await GetTargetId();
 
             if (targetUserId == 0) return;
 
             TotalPosts = (await GetWallPosts(targetUserId, count: 1)).TotalCount;
-            progressPosts.Report(TotalPosts.ToString());
+            progressPosts.Report(TotalPosts);
 
             TotalPhotos = (await GetPhotos(targetUserId, count: 1)).TotalCount;
-            progressPhotos.Report(TotalPhotos.ToString());
+            progressPhotos.Report(TotalPhotos);
         }
 
         //Лайк постов
-        public async Task LikePosts(IProgress<string> progressCounter = null)
+        public async Task LikePosts(IProgress<long> progressCounter = null)
         {
             if (Amount == 0) Amount = 100000;
             long targetUserId = await GetTargetId();
@@ -71,7 +71,7 @@ namespace VkLikerMVVM
 
                     await _api.Likes.AddAsync(new LikesAddParams { ItemId = postId, OwnerId = targetUserId, Type = LikeObjectType.Post, AccessKey = wallPosts.WallPosts[b].AccessKey });
 
-                    progressCounter.Report((i + b + 1).ToString());
+                    progressCounter.Report((i + b + 1));
                     
                     //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
                     if ((i + b + 2) > Amount + Offset) return;
@@ -82,14 +82,14 @@ namespace VkLikerMVVM
         }
 
         //Лайк фото
-        public async Task LikePhotos(IProgress<string> progressCounter = null)
+        public async Task LikePhotos(IProgress<long> progressCounter = null)
         {
                 if (Amount == 0) Amount = 100000;
                 long targetUserId = await GetTargetId();
 
             for (uint i = Offset; i < TotalPhotos || i < Offset + Amount; i += 200)
             {
-                VkCollection<Photo> photos = await GetPhotos(targetUserId, offset: i);
+                VkCollection<Photo> photos = await GetPhotos(targetUserId, i);
                 
                 for (int b = 0; b < (int)photos.TotalCount; b++)
                 {
@@ -97,7 +97,7 @@ namespace VkLikerMVVM
 
                     await _api.Likes.AddAsync(new LikesAddParams { ItemId = photoId, OwnerId = targetUserId, Type = LikeObjectType.Photo, AccessKey = photos[b].AccessKey });
 
-                    progressCounter.Report((i + b + 1).ToString());
+                    progressCounter.Report(i + b + 1);
 
                     //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
                     if ((i + b + 2) > Amount + Offset) return;

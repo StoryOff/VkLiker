@@ -1,4 +1,4 @@
-﻿namespace VkLikerMVVM
+﻿namespace VkLikerMVVM.ViewModels
 {
     class Settings : JsonSettings
     {
