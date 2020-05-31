@@ -1,4 +1,5 @@
-﻿using VkLikerMVVM.ViewModels;
+﻿using MahApps.Metro.Controls.Dialogs;
+using VkLikerMVVM.ViewModels;
 
 namespace VkLikerMVVM
 {
@@ -10,7 +11,7 @@ namespace VkLikerMVVM
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+            DataContext = new MainViewModel(DialogCoordinator.Instance);
         }
     }
 }

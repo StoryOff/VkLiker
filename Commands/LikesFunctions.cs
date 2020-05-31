@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using VkNet;
@@ -20,7 +21,7 @@ namespace VkLikerMVVM.Commands
             _api = api;
         }
 
-        public static readonly Random r = new Random();
+        public static readonly Random R = new Random();
 
         private int _delayMin = 10000;
         private int _delayMax = 15000;
@@ -36,74 +37,148 @@ namespace VkLikerMVVM.Commands
         }
 
         public string Target { get; set; }
-        public int Amount { get; set; } = 0;
         public uint Offset { get; set; } = 0;
+
+        public bool IsStop;
+        public bool DisLike;
+
+        public delegate void ItemLiked(long currentItemLiked);
+        public event ItemLiked ShowTotalPosts;
+        public event ItemLiked ShowTotalPhotos;
+        public event ItemLiked PostNotify;
+        public event ItemLiked PhotoNotify;
+
+        public string TxtPath;
 
         private ulong TotalPosts { get; set; }
         private ulong TotalPhotos { get; set; }
 
+        private static readonly Random _rnd = new Random();
+
+
         //Получить информацию о количестве постов и фото пользователя
-        public async Task GetTargetInfo(IProgress<ulong> progressPosts = null, IProgress<ulong> progressPhotos = null)
+        public async Task GetTargetInfo()
         {
             long targetUserId = await GetTargetId();
 
             if (targetUserId == 0) return;
 
             TotalPosts = (await GetWallPosts(targetUserId, count: 1)).TotalCount;
-            progressPosts.Report(TotalPosts);
+            ShowTotalPosts?.Invoke((long)TotalPosts);
 
             TotalPhotos = (await GetPhotos(targetUserId, count: 1)).TotalCount;
-            progressPhotos.Report(TotalPhotos);
+            ShowTotalPhotos?.Invoke((long)TotalPhotos);
         }
 
         //Лайк постов
-        public async Task LikePosts(IProgress<long> progressCounter = null)
+        public async Task LikePosts(int amount)
         {
-            if (Amount == 0) Amount = 100000;
-            long targetUserId = await GetTargetId();
-            for (uint i = Offset; i < TotalPosts || i < Offset + Amount; i += 100)
+            if (amount == 0) amount = 100000;
+            long targetId = await GetTargetId();
+            for (uint i = Offset; i < TotalPosts || i < Offset + amount; i += 100)
             {
-                WallGetObject wallPosts = await GetWallPosts(targetUserId, offset: i);
-
-                for (int b = 0; b < (int)wallPosts.TotalCount; b++)
+                if (!IsStop)
                 {
-                    long postId = wallPosts.WallPosts[b].Id.Value;
+                    WallGetObject wallPosts = await GetWallPosts(targetId, offset: i);
+                    for (int b = 0; b < (int)wallPosts.TotalCount; b++)
+                    {
+                        if (!IsStop)
+                        {
+                            long postId = wallPosts.WallPosts[b].Id.Value;
 
-                    await _api.Likes.AddAsync(new LikesAddParams { ItemId = postId, OwnerId = targetUserId, Type = LikeObjectType.Post, AccessKey = wallPosts.WallPosts[b].AccessKey });
+                            if (DisLike) await _api.Likes.DeleteAsync(LikeObjectType.Post, postId, targetId);
+                            else await _api.Likes.AddAsync(new LikesAddParams { ItemId = postId, OwnerId = targetId, Type = LikeObjectType.Post, AccessKey = wallPosts.WallPosts[b].AccessKey });
 
-                    progressCounter.Report((i + b + 1));
-                    
-                    //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
-                    if ((i + b + 2) > Amount + Offset) return;
+                            PostNotify?.Invoke(i + b + 1);
 
-                    await Task.Delay(r.Next(DelayMin, DelayMax));
+                            //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
+                            if ((i + b + 2) > amount + Offset) return;
+
+                            await Task.Delay(R.Next(DelayMin, DelayMax));
+                        }
+                        else return;
+                    }
                 }
+                else return;
             }
         }
 
         //Лайк фото
-        public async Task LikePhotos(IProgress<long> progressCounter = null)
+        public async Task LikePhotos(int amount)
         {
-                if (Amount == 0) Amount = 100000;
-                long targetUserId = await GetTargetId();
+            if (amount == 0) amount = 100000;
+            long targetId = await GetTargetId();
 
-            for (uint i = Offset; i < TotalPhotos || i < Offset + Amount; i += 200)
+            for (uint i = Offset; i < TotalPhotos || i < Offset + amount; i += 200)
             {
-                VkCollection<Photo> photos = await GetPhotos(targetUserId, i);
-                
-                for (int b = 0; b < (int)photos.TotalCount; b++)
+                if (!IsStop)
                 {
-                    long photoId = photos.ToList()[b].Id.Value;
+                    VkCollection<Photo> photos = await GetPhotos(targetId, i);
 
-                    await _api.Likes.AddAsync(new LikesAddParams { ItemId = photoId, OwnerId = targetUserId, Type = LikeObjectType.Photo, AccessKey = photos[b].AccessKey });
+                    for (int b = 0; b < (int)photos.TotalCount; b++)
+                    {
+                        if (!IsStop)
+                        {
+                            long photoId = photos.ToList()[b].Id.Value;
 
-                    progressCounter.Report(i + b + 1);
+                            if (DisLike) await _api.Likes.DeleteAsync(LikeObjectType.Photo, photoId, targetId);
+                            else await _api.Likes.AddAsync(new LikesAddParams { ItemId = photoId, OwnerId = targetId, Type = LikeObjectType.Photo, AccessKey = photos[b].AccessKey });
 
-                    //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
-                    if ((i + b + 2) > Amount + Offset) return;
-                    
-                    await Task.Delay(r.Next(DelayMin, DelayMax));
+                            PhotoNotify?.Invoke(i + b + 1);
+
+                            //оффсет + текущий объект + 2(отсчет от нуля + следующая итерация) > количества требуемых лайков + оффсет
+                            if ((i + b + 2) > amount + Offset) return;
+
+                            await Task.Delay(R.Next(DelayMin, DelayMax));
+                        }
+                        else return;
+                    }
                 }
+                else return;
+            }
+        }
+
+        public async Task LikeList(int amount)
+        {
+            if (amount == 0) amount = 100000;
+
+            List<string> links = File.ReadAllLines(TxtPath).ToList();
+
+            for (int i = 0; i < links.Count && i < amount; i++)
+            {
+                //рандом для случайного выбора пользователя из списка
+                int rndNum = _rnd.Next(links.Count);
+
+                Target = links[rndNum].Split("/").LastOrDefault();
+                long targetId = await GetTargetId();
+                //TargetId==0 - значит, профиль закрыт и нет доступа.
+                if (targetId!= 0)
+                {
+                    //рандом для случайного выбора поста/фото
+                    int randNum;
+                    //получить фото и лайкнуть 2 случайных, если они есть
+                    var photos = await GetPhotos(targetId);
+                    if (photos.Count > 0)
+                    {
+                        randNum = _rnd.Next(photos.Count-1);
+                        await _api.Likes.AddAsync(new LikesAddParams { ItemId = photos[randNum].Id.Value, OwnerId = targetId, Type = LikeObjectType.Photo, AccessKey = photos[randNum].AccessKey });
+                        randNum = _rnd.Next(photos.Count-1);
+                        await _api.Likes.AddAsync(new LikesAddParams { ItemId = photos[randNum].Id.Value, OwnerId = targetId, Type = LikeObjectType.Photo, AccessKey = photos[randNum].AccessKey });
+                    }
+                    //получить посты и лайкнуть 2 случайных, если они есть
+                    var posts = await GetWallPosts(targetId);
+                    if (posts.TotalCount > 0)
+                    {
+                        randNum = _rnd.Next((int)posts.TotalCount-1);
+                        await _api.Likes.AddAsync(new LikesAddParams { ItemId = posts.WallPosts[randNum].Id.Value, OwnerId = targetId, Type = LikeObjectType.Post, AccessKey = posts.WallPosts[randNum].AccessKey });
+                        randNum = _rnd.Next((int)posts.TotalCount-1);
+                        await _api.Likes.AddAsync(new LikesAddParams { ItemId = posts.WallPosts[randNum].Id.Value, OwnerId = targetId, Type = LikeObjectType.Post, AccessKey = posts.WallPosts[randNum].AccessKey });
+                    }
+                }
+
+                links.RemoveAt(rndNum);
+
+                await File.WriteAllLinesAsync(TxtPath, links.ToArray());
             }
         }
 
@@ -119,11 +194,11 @@ namespace VkLikerMVVM.Commands
         }
 
         //Получить фото пользователя
-        private async Task<VkCollection<Photo>> GetPhotos(long targetid, uint offset = 0, ulong count = 200)
+        private async Task<VkCollection<Photo>> GetPhotos(long targetId, uint offset = 0, ulong count = 200)
         {
             return await _api.Photo.GetAllAsync(new PhotoGetAllParams
             {
-                OwnerId = targetid,
+                OwnerId = targetId,
                 Offset = offset,
                 Count = count
             });
@@ -136,7 +211,9 @@ namespace VkLikerMVVM.Commands
 
             else
             {
-                return (await _api.Users.GetAsync(new List<string> { Target })).LastOrDefault().Id;
+                var user = (await _api.Users.GetAsync(new List<string> { Target })).LastOrDefault();
+                if ((bool)!user.IsClosed || (bool)user.CanAccessClosed) return user.Id;
+                else return 0;
             }
         }
     }

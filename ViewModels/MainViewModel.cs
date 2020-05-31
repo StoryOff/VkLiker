@@ -7,6 +7,7 @@ using VkNet;
 using VkNet.AudioBypassService.Exceptions;
 using VkNet.Exception;
 using VkNet.Model;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace VkLikerMVVM.ViewModels
 {
@@ -16,21 +17,19 @@ namespace VkLikerMVVM.ViewModels
 
         //VkNet
         private User _currentUser = new User();
-
         private VkApi _api;
 
         //Визибилити
         private bool _isMainInterfaceVisible;
         private bool _isLoginPanelVisible = true;
         private bool _isLogPassVisible = true;
-
         private bool _isTwoAuthVisible;
 
         //Текст боксы
         private string _screenName = "Screen Name";
-        private ulong _totalPosts;
+        private long _totalPosts;
         private long _postsLiked;
-        private ulong _totalPhotos;
+        private long _totalPhotos;
         private long _photosLiked;
         private string _likesTarget;
         private int _delayMin = 10;
@@ -45,10 +44,20 @@ namespace VkLikerMVVM.ViewModels
         //isHitTestVisible
         private bool _isUiUnLocked = true;
 
+        //MahApps.Metro
+        private readonly IDialogCoordinator dialogCoordinator;
+
+        //Булы(баттоны/тоглбаттны)
+        private bool _isStop = true;
+        private bool _disLike;
+
+        //Путь
+        private string _txtPath;
+
         #endregion
 
         //Конструктор
-        public MainViewModel()
+        public MainViewModel(IDialogCoordinator instance)
         {
             #region Commands
 
@@ -56,6 +65,13 @@ namespace VkLikerMVVM.ViewModels
             GetInfoCommand = new RelayCommand(async obj => await GetInfo());
             LikePostsCommand = new RelayCommand(obj => LikePosts());
             LikePhotosCommand = new RelayCommand(obj => LikePhotos());
+            StopCommand = new RelayCommand(obj => { isStop = true; MessageBox.Show("Прогресс остановлен"); });
+            ChooseTxtPathCommand = new RelayCommand(obj => ChooseTxtPath());
+            LikeListCommand = new RelayCommand(obj => LikeList());
+
+            #endregion
+
+            #region Events
 
             #endregion
 
@@ -65,6 +81,8 @@ namespace VkLikerMVVM.ViewModels
             {
                 Authorize(null);
             }
+
+            dialogCoordinator = instance;
         }
 
         #region VkNet
@@ -80,6 +98,12 @@ namespace VkLikerMVVM.ViewModels
                 {
                     CurrentUser = LoginFunctions.GetCurrentUser();
                     _likesFunctions = new LikesFunctions(value);
+
+                    //подписка на эвенты
+                    _likesFunctions.ShowTotalPosts += (ShowTotalPosts) => TotalPosts = ShowTotalPosts;
+                    _likesFunctions.ShowTotalPhotos += ShowTotalPhotos;
+                    _likesFunctions.PostNotify += PostProgress;
+                    _likesFunctions.PhotoNotify += PhotoProgress;
                 }
             }
         }
@@ -126,7 +150,7 @@ namespace VkLikerMVVM.ViewModels
 
         #region TextBox
 
-        public ulong TotalPosts
+        public long TotalPosts
         {
             get => _totalPosts;
             set => SetProperty(ref _totalPosts, value);
@@ -138,7 +162,7 @@ namespace VkLikerMVVM.ViewModels
             set => SetProperty(ref _postsLiked, value);
         }
 
-        public ulong TotalPhotos
+        public long TotalPhotos
         {
             get => _totalPhotos;
             set => SetProperty(ref _totalPhotos, value);
@@ -165,15 +189,19 @@ namespace VkLikerMVVM.ViewModels
             get => _delayMax;
             set
             {
-                SetProperty(ref _delayMax, value);
-                _likesFunctions.DelayMax = value;
+                if (value > DelayMin)
+                {
+                    SetProperty(ref _delayMax, value);
+                    _likesFunctions.DelayMax = value;
+                }
+                else dialogCoordinator.ShowModalMessageExternal(this, "Error", "Значение \"До\" должно быть больше, чем значение \"От\"");
             }
         }
 
         public int LikesCount
         {
             get => _likesCount;
-            set => _likesFunctions.Amount = _likesCount = value;
+            set => _likesCount = value;
         }
 
         public uint LikesOffset
@@ -213,12 +241,49 @@ namespace VkLikerMVVM.ViewModels
 
         #endregion
 
+        #region bools
+        public bool isStop
+        {
+            get => _isStop;
+            set
+            {
+                SetProperty(ref _isStop, value);
+                _likesFunctions.IsStop = value;
+            }
+        }
+
+        public bool DisLike
+        {
+            get => _disLike;
+            set
+            {
+                SetProperty(ref _disLike, value);
+                _likesFunctions.DisLike = value;
+            }
+        }
+        #endregion
+
+        #region Путь
+        public string TxtPath
+        {
+            get => _txtPath;
+            set
+            {
+                SetProperty(ref _txtPath, value);
+                _likesFunctions.TxtPath = value;
+            }
+        }
+        #endregion
+
         #region Commands
 
         public RelayCommand AuthorizeCommand { get; }
         public RelayCommand GetInfoCommand { get; }
         public RelayCommand LikePostsCommand { get; }
         public RelayCommand LikePhotosCommand { get; }
+        public RelayCommand StopCommand { get; }
+        public RelayCommand ChooseTxtPathCommand { get; }
+        public RelayCommand LikeListCommand { get; }
 
         #endregion
 
@@ -272,7 +337,6 @@ namespace VkLikerMVVM.ViewModels
             catch (CaptchaNeededException)
             {
                 MessageBox.Show("Требуется ввести капчу");
-                throw new NotImplementedException(); // сам уберешь это.
             }
             catch (InvalidOperationException)
             {
@@ -304,9 +368,7 @@ namespace VkLikerMVVM.ViewModels
                     MessageBox.Show("Введите цель", "Error");
                 else
                 {
-                    var progressTotalPosts = new Progress<ulong>(report => TotalPosts = report);
-                    var progressTotalPhotos = new Progress<ulong>(report => TotalPhotos = report);
-                    await _likesFunctions.GetTargetInfo(progressTotalPosts, progressTotalPhotos);
+                    await _likesFunctions.GetTargetInfo();
                 }
             }
             catch (Exception ex)
@@ -322,12 +384,20 @@ namespace VkLikerMVVM.ViewModels
 
             else
             {
-                await GetInfo();
-                var itemLiked = new Progress<long>(report => PostsLiked = report);
-                IsUiUnLocked = false;
-                await _likesFunctions.LikePosts(itemLiked);
-                MessageBox.Show("Готово!", "Done");
-                IsUiUnLocked = true;
+                try
+                {
+                    isStop = false;
+                    IsUiUnLocked = false;
+                    await GetInfo();
+                    await _likesFunctions.LikePosts(LikesCount);
+                    if (!isStop) MessageBox.Show("Готово!", "Done");
+                    IsUiUnLocked = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                    IsUiUnLocked = true;
+                }
             }
         }
 
@@ -338,15 +408,75 @@ namespace VkLikerMVVM.ViewModels
 
             else
             {
-                await GetInfo();
-                var itemLiked = new Progress<long>(report => PhotosLiked = report);
-                IsUiUnLocked = false;
-                await _likesFunctions.LikePhotos(itemLiked);
-                MessageBox.Show("Готово!", "Done");
-                IsUiUnLocked = true;
+                try
+                {
+                    isStop = false;
+                    IsUiUnLocked = false;
+                    await GetInfo();
+                    await _likesFunctions.LikePhotos(LikesCount);
+                    if (!isStop) MessageBox.Show("Готово!", "Done");
+                    IsUiUnLocked = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                    IsUiUnLocked = true;
+                }
             }
         }
 
+        private void ChooseTxtPath()
+        {
+            var dlg = new System.Windows.Forms.OpenFileDialog();
+            dlg.InitialDirectory = "C:\\";
+            dlg.DefaultExt = "txt";
+            dlg.Filter = "Text file (*.txt)|*.txt|All files (*.*)|*.*";
+            dlg.CheckFileExists = true;
+            dlg.CheckPathExists = true;
+            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK) TxtPath = dlg.FileName;
+        }
+
+        private async void LikeList()
+        {
+            if (string.IsNullOrEmpty(TxtPath))
+                MessageBox.Show("Выберите Txt файл со списком ссылок", "Error");
+            else
+            {
+                try
+                {
+                    isStop = false;
+                    DisLike = false;
+                    LikesTarget = string.Empty;
+                    IsUiUnLocked = false;
+
+                    await _likesFunctions.LikeList(LikesCount);
+                    if (!isStop) MessageBox.Show("Готово!", "Done");
+                    IsUiUnLocked = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                    IsUiUnLocked = true;
+                }
+            }
+        }
+
+
+        private void ShowTotalPhotos(long Total)
+        {
+            TotalPhotos = Total;
+        }
+
+        private void PostProgress(long Progress)
+        {
+            PostsLiked = Progress;
+        }
+
+        private void PhotoProgress(long Progress)
+        {
+            PhotosLiked = Progress;
+        }
         #endregion
     }
 }
